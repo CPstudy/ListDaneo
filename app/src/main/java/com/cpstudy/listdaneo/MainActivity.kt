@@ -2,19 +2,14 @@ package com.cpstudy.listdaneo
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import com.cpstudy.listdaneo.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
-
-    private val list = arrayListOf<Daneo>(
-            Daneo("apple", "사과"),
-            Daneo("banana", "바나나"),
-            Daneo("cat", "고양이"),
-            Daneo("dog", "개"),
-            Daneo("elephant", "코끼리")
-    )
 
     private val binding by lazy {
         DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
@@ -25,12 +20,18 @@ class MainActivity : AppCompatActivity() {
         val model: MainViewModel by viewModels()
 
         binding.viewmodel = model
-        val adapter = MainAdapter(list)
+        val adapter = model.daneoList.value?.let { MainAdapter(it) }
         binding.recyclerView.adapter = adapter
 
         binding.button.setOnClickListener {
-            val dialog: DaneoDialog = DaneoDialog(this)
+            val dialog = DaneoDialog(this) {
+                model.addDaneo(it)
+            }
             dialog.show()
+        }
+
+        model.daneoList.observe(this) {
+            //adapter?.notifyDataSetChanged()
         }
     }
 }
